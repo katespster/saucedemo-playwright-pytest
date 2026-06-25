@@ -1,0 +1,55 @@
+name: SauceDemo Playwright Tests
+
+on:
+  push:
+    branches: [ main ]
+  pull_request:
+    branches: [ main ]
+  workflow_dispatch:
+
+jobs:
+  e2e-tests:
+    name: Run Playwright UI Tests
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+
+    env:
+      SAUCEDEMO_BASE_URL: https://www.saucedemo.com/
+      SAUCEDEMO_USERNAME: standard_user
+      SAUCEDEMO_PASSWORD: secret_sauce
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v5
+
+      - name: Set up Python
+        uses: actions/setup-python@v6
+        with:
+          python-version: "3.13"
+
+      - name: Install Python dependencies
+        run: |
+          python -m pip install --upgrade pip
+          pip install -r requirements.txt
+
+      - name: Install Playwright browser
+        run: |
+          python -m playwright install --with-deps chromium
+
+      - name: Run Pytest tests
+        run: |
+          python -m pytest --browser chromium --alluredir=allure-results
+
+      - name: Upload Allure results
+        if: always()
+        uses: actions/upload-artifact@v5
+        with:
+          name: allure-results
+          path: allure-results/
+
+      - name: Upload Playwright traces and test results
+        if: always()
+        uses: actions/upload-artifact@v5
+        with:
+          name: playwright-test-results
+          path: test-results/
