@@ -38,18 +38,4 @@ jobs:
 
       - name: Run Pytest tests
         run: |
-          python -m pytest --browser chromium --alluredir=allure-results
-
-      - name: Upload Allure results
-        if: always()
-        uses: actions/upload-artifact@v5
-        with:
-          name: allure-results
-          path: allure-results/
-
-      - name: Upload Playwright traces and test results
-        if: always()
-        uses: actions/upload-artifact@v5
-        with:
-          name: playwright-test-results
-          path: test-results/
+          python -m pytest --browser chromium
